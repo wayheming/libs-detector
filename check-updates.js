@@ -79,7 +79,9 @@ async function callGPTAPI(description) {
         - **AI Analysis:** ${aiAnalysis}
       `;
 
-      await sendToSlack(message);
+      console.log(message);
+
+      //await sendToSlack(message);
     }
   }
 })();
