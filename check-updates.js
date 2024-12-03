@@ -10,11 +10,7 @@ const repositories = [
 async function fetchRepositoryData(repoName) {
   const url = `https://api.github.com/repos/${repoName}/releases`;
 
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-    },
-  });
+  const response = await fetch(url);
 
   if (!response.ok) {
     console.error(`Error fetching data for ${repoName}: ${response.statusText}`);
