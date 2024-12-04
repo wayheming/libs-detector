@@ -3,9 +3,9 @@ import fs from 'fs/promises';
 
 const repositories = [
   'jackocnr/intl-tel-input',
-  'cure53/DOMPurify',
-  'chartjs/Chart.js',
-  'Choices-js/Choices',
+  // 'cure53/DOMPurify',
+  // 'chartjs/Chart.js',
+  // 'Choices-js/Choices',
 ];
 
 const CACHE_FILE = 'checked_versions.json';
