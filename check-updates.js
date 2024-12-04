@@ -94,9 +94,7 @@ async function callGPTAPI(description, repo, version, url) {
         ],
       }),
     });
-
-    console.log(response);
-
+    
     if (!response.ok) {
       console.error(`Error calling OpenAI API: ${response.statusText}`);
       return null;
@@ -104,9 +102,12 @@ async function callGPTAPI(description, repo, version, url) {
 
     const json = await response.json();
     const structuredOutput = JSON.parse(json.choices[0].message.content);
+
+    console.log(response);
+    
     return structuredOutput;
   } catch (err) {
-    console.error(`Error calling OpenAI API: ${err.message}`);
+    console.error(`Error calling OpenAI API (catch): ${err.message}`);
     return null;
   }
 }
