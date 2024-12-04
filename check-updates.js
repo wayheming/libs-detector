@@ -20,7 +20,6 @@ async function loadCache() {
 }
 
 async function saveCache(cache) {
-  console.log(JSON.stringify(cache, null, 2));
   try {
     await fs.writeFile(CACHE_FILE, JSON.stringify(cache, null, 2));
   } catch (err) {
@@ -129,13 +128,11 @@ async function callGPTAPI(description, repo, version, url) {
 
     const { tag_name, html_url, body } = release;
 
-    // Перевірка кешу
     if (cache[repo] === tag_name) {
       console.log(`Version ${tag_name} of ${repo} is already checked. Skipping.`);
       continue;
     }
 
-    // Аналіз AI
     let aiAnalysis;
     try {
       aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
@@ -153,13 +150,15 @@ async function callGPTAPI(description, repo, version, url) {
 :ai: AI Summary: ${aiAnalysis['ai-summary']}
 `;
       try {
-        await sendToSlack(message);
+        // await sendToSlack(message);
       } catch (err) {
         console.error(`Error sending message to Slack for ${repo}:`, err.message);
+        continue;
       }
     }
 
-    // Оновлення кешу
+    console.log(cache);
+
     cache[repo] = tag_name;
     await saveCache(cache);
   }
