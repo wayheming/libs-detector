@@ -138,7 +138,7 @@ async function callGPTAPI(description, repo, version, url) {
 :link: URL: ${html_url}
 :closed_lock_with_key: Severity: ${aiAnalysis.severity.toUpperCase()}
 :ai: AI Summary: ${aiAnalysis['ai-summary']}
-        `;
+`;
 
         await sendToSlack(message);
       }
