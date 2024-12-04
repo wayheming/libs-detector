@@ -123,8 +123,9 @@ async function callGPTAPI(description, repo, version, url) {
       }
 
       const aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
+      console.log(aiAnalysis);
 
-      if (aiAnalysis && (aiAnalysis.severity === 'medium' || aiAnalysis.severity === 'high')) {
+      if (aiAnalysis && (aiAnalysis.severity === 'low' || aiAnalysis.severity === 'medium' || aiAnalysis.severity === 'high')) {
         const message = `
           :wave: Update detected for ${repo}!
           - **Version:** ${tag_name}
@@ -133,12 +134,8 @@ async function callGPTAPI(description, repo, version, url) {
           - **Summary:** ${aiAnalysis['ai-summary']}
         `;
 
-
-        // Uncomment to send to Slack
-        // await sendToSlack(message);
+        await sendToSlack(message);
       }
-
-      console.log(aiAnalysis);
       
       // Update cache
       cache[repo] = tag_name;
