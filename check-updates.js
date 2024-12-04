@@ -119,51 +119,48 @@ async function callGPTAPI(description, repo, version, url) {
   console.log(cache);
 
   for (const repo of repositories) {
+    
+    const release = await fetchRepositoryData(repo);
+
+    if (!release) {
+      console.log(`No release data found for ${repo}.`);
+      continue;
+    }
+
+    const { tag_name, html_url, body } = release;
+
+    // Перевірка кешу
+    if (cache[repo] === tag_name) {
+      console.log(`Version ${tag_name} of ${repo} is already checked. Skipping.`);
+      continue;
+    }
+
+    // Аналіз AI
+    let aiAnalysis;
     try {
-      const release = await fetchRepositoryData(repo);
-  
-      if (!release) {
-        console.log(`No release data found for ${repo}.`);
-        continue;
-      }
-  
-      const { tag_name, html_url, body } = release;
-  
-      // Перевірка кешу
-      if (cache[repo] === tag_name) {
-        console.log(`Version ${tag_name} of ${repo} is already checked. Skipping.`);
-        continue;
-      }
-  
-      // Аналіз AI
-      let aiAnalysis;
-      try {
-        aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
-      } catch (err) {
-        console.error(`Error analyzing release with AI for ${repo}:`, err.message);
-        continue;
-      }
-  
-      if (aiAnalysis && ['low', 'medium', 'high'].includes(aiAnalysis.severity)) {
-        const message = `
+      aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
+    } catch (err) {
+      console.error(`Error analyzing release with AI for ${repo}:`, err.message);
+      continue;
+    }
+
+    if (aiAnalysis && ['low', 'medium', 'high'].includes(aiAnalysis.severity)) {
+      const message = `
 :wave: Important release detected for ${repo}!
 :card_index_dividers: Version: ${tag_name}
 :link: URL: ${html_url}
 :closed_lock_with_key: Severity: ${aiAnalysis.severity.toUpperCase()}
 :ai: AI Summary: ${aiAnalysis['ai-summary']}
 `;
-        try {
-          await sendToSlack(message);
-        } catch (err) {
-          console.error(`Error sending message to Slack for ${repo}:`, err.message);
-        }
+      try {
+        await sendToSlack(message);
+      } catch (err) {
+        console.error(`Error sending message to Slack for ${repo}:`, err.message);
       }
-  
-      // Оновлення кешу
-      cache[repo] = tag_name;
-      await saveCache(cache);
-    } catch (err) {
-      console.error(`Error processing repository ${repo}:`, err.message);
     }
+
+    // Оновлення кешу
+    cache[repo] = tag_name;
+    await saveCache(cache);
   }
 })();
