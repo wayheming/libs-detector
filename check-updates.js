@@ -47,7 +47,7 @@ async function sendToSlack(message) {
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: message }),
+    body: JSON.stringify({ data: message }),
   });
 
   if (!response.ok) {
@@ -115,7 +115,7 @@ async function callGPTAPI(description, repo, version, url) {
 (async () => {
   const cache = await loadCache();
 
-  // console.log(cache);
+  console.log(cache);
 
   for (const repo of repositories) {
     const release = await fetchRepositoryData(repo);
@@ -130,7 +130,6 @@ async function callGPTAPI(description, repo, version, url) {
       }
 
       const aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
-      console.log(aiAnalysis);
 
       if (aiAnalysis && (aiAnalysis.severity === 'low' || aiAnalysis.severity === 'medium' || aiAnalysis.severity === 'high')) {
         const message = `
@@ -140,8 +139,6 @@ async function callGPTAPI(description, repo, version, url) {
           - **Severity:** ${aiAnalysis.severity.toUpperCase()}
           - **Summary:** ${aiAnalysis['ai-summary']}
         `;
-
-        console.log(message);
 
         await sendToSlack(message);
       }
