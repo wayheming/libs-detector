@@ -80,7 +80,8 @@ async function callGPTAPI(description, repo, version, url) {
             - "severity": One of "low", "medium", or "high" indicating the importance of the update.
             - "ai-summary": A brief AI-generated summary of the release.
 
-           Return only clean and valid JSON text
+           Return only clean and valid JSON text without.
+           Give me the response without JSON formatting.
             
             Example response:
             {
