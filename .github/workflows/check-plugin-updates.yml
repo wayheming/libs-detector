@@ -17,6 +17,14 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Cache checked versions
+        uses: actions/cache@v3
+        with:
+          path: checked_versions.json
+          key: checked-versions-${{ runner.os }}-${{ hashFiles('checked_versions.json') }}
+          restore-keys: |
+            checked-versions-${{ runner.os }}-
+
       - name: Install dependencies
         run: npm install
 
