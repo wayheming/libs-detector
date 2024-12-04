@@ -102,8 +102,6 @@ async function callGPTAPI(description, repo, version, url) {
   const json = await response.json();
   const structuredOutput = json.choices[0].message.content;
   
-  console.log(structuredOutput);
-  
   return structuredOutput;
 }
 
@@ -141,43 +139,6 @@ async function callGPTAPI(description, repo, version, url) {
       }
 
       // Update cache
-      cache[repo] = tag_name;
-      await saveCache(cache);
-    }
-  }
-})();
-
-(async () => {
-  const cache = await loadCache();
-
-  for (const repo of repositories) {
-    const release = await fetchRepositoryData(repo);
-
-    if (release) {
-      const { tag_name, html_url, body } = release;
-
-      if (cache[repo] === tag_name) {
-        console.log(`Version ${tag_name} of ${repo} is already checked. Skipping.`);
-        continue;
-      }
-
-     const aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
-
-      if (aiAnalysis && (aiAnalysis.severity === 'medium' || aiAnalysis.severity === 'high')) {
-        const message = `
-          :wave: Update detected for ${aiAnalysis.library}!
-          - **Version:** ${aiAnalysis.version}
-          - **URL:** ${aiAnalysis.URL}
-          - **Severity:** ${aiAnalysis.severity.toUpperCase()}
-          - **Summary:** ${aiAnalysis['ai-summary']}
-        `;
-
-        console.log(message);
-
-        // Uncomment to send to Slack
-        // await sendToSlack(message);
-      }
-
       cache[repo] = tag_name;
       await saveCache(cache);
     }
