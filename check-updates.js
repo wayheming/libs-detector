@@ -56,9 +56,9 @@ async function sendToSlack(message) {
 }
 
 async function callGPTAPI(description, repo, version, url) {
-  const url = 'https://api.openai.com/v1/chat/completions';
+  const apiUrl = 'https://api.openai.com/v1/chat/completions';
 
-  const response = await fetch(url, {
+  const response = await fetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
