@@ -56,9 +56,9 @@ async function sendToSlack(message) {
 }
 
 async function callGPTAPI(description, repo, version, url) {
-  const apiUrl = 'https://api.openai.com/v1/chat/completions';
+  const url = 'https://api.openai.com/v1/chat/completions';
 
-  const response = await fetch(apiUrl, {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -104,18 +104,12 @@ async function callGPTAPI(description, repo, version, url) {
 
   const json = await response.json();
   const structuredOutput = json.choices[0].message.content;
-
-  // console.log(repo);
-  // console.log(structuredOutput);
-  // console.log('---');
   
   return JSON.parse(structuredOutput);
 }
 
 (async () => {
   const cache = await loadCache();
-
-  // console.log(cache);
 
   for (const repo of repositories) {
     
