@@ -58,58 +58,53 @@ async function sendToSlack(message) {
 async function callGPTAPI(description, repo, version, url) {
   const apiUrl = 'https://api.openai.com/v1/chat/completions';
 
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'user',
-            content: `
-              You're a WPForms Developer trying to determine the significance of a new library update.
-              Here's a release description/changelog for evaluation: "${description}"
-              
-              Please provide a structured JSON output with the following keys:
-              - "library": ${repo}
-              - "version": ${version}
-              - "URL": ${url}
-              - "severity": One of "low", "medium", or "high" indicating the importance of the update.
-              - "ai-summary": A brief AI-generated summary of the release.
-              
-              Example response:
-              {
-                "library": "example-library",
-                "version": "1.2.3",
-                "URL": "https://example.com",
-                "severity": "medium",
-                "ai-summary": "This release fixes several security vulnerabilities."
-              }
-            `,
-          },
-        ],
-      }),
-    });
-    
-    if (!response.ok) {
-      console.error(`Error calling OpenAI API: ${response.statusText}`);
-      return null;
-    }
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'user',
+          content: `
+            You're a WPForms Developer trying to determine the significance of a new library update.
+            Here's a release description/changelog for evaluation: "${description}"
+            
+            Please provide a structured JSON output with the following keys:
+            - "library": ${repo}
+            - "version": ${version}
+            - "URL": ${url}
+            - "severity": One of "low", "medium", or "high" indicating the importance of the update.
+            - "ai-summary": A brief AI-generated summary of the release.
+            
+            Example response:
+            {
+              "library": "example-library",
+              "version": "1.2.3",
+              "URL": "https://example.com",
+              "severity": "medium",
+              "ai-summary": "This release fixes several security vulnerabilities."
+            }
+          `,
+        },
+      ],
+    }),
+  });
 
-    const json = await response.json();
-    const structuredOutput = JSON.parse(json.choices[0].message.content);
-
-    console.log(response);
-    
-    return structuredOutput;
-  } catch (err) {
-    console.error(`Error calling OpenAI API (catch): ${err.message}`);
-    return null;
+  if (!response.ok) {
+    console.error(`Error calling OpenAI API: ${response.statusText}`);
+    return 'Failed to evaluate with AI.';
   }
+
+  const json = await response.json();
+  const structuredOutput = JSON.parse(json.choices[0].message.content);
+
+  console.log(structuredOutput);
+  
+  return structuredOutput;
 }
 
 (async () => {
