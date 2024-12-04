@@ -130,7 +130,7 @@ async function callGPTAPI(description, repo, version, url) {
       }
 
       const aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
-      // console.log(aiAnalysis);
+      console.log(aiAnalysis);
 
       if (aiAnalysis && (aiAnalysis.severity === 'low' || aiAnalysis.severity === 'medium' || aiAnalysis.severity === 'high')) {
         const message = `
@@ -140,6 +140,8 @@ async function callGPTAPI(description, repo, version, url) {
           - **Severity:** ${aiAnalysis.severity.toUpperCase()}
           - **Summary:** ${aiAnalysis['ai-summary']}
         `;
+
+        console.log(message);
 
         await sendToSlack(message);
       }
