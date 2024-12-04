@@ -106,9 +106,9 @@ async function callGPTAPI(description, repo, version, url) {
   const json = await response.json();
   const structuredOutput = json.choices[0].message.content;
 
-  console.log(repo);
-  console.log(structuredOutput);
-  console.log('---');
+  // console.log(repo);
+  // console.log(structuredOutput);
+  // console.log('---');
   
   return JSON.parse(structuredOutput);
 }
@@ -116,7 +116,7 @@ async function callGPTAPI(description, repo, version, url) {
 (async () => {
   const cache = await loadCache();
 
-  console.log(cache);
+  // console.log(cache);
 
   for (const repo of repositories) {
     
