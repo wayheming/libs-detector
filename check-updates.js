@@ -103,6 +103,7 @@ async function callGPTAPI(description, repo, version, url) {
   const structuredOutput = json.choices[0].message.content;
 
   console.log(structuredOutput);
+  console.log('---');
   
   return JSON.parse(structuredOutput);
 }
