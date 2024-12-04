@@ -133,12 +133,13 @@ async function callGPTAPI(description, repo, version, url) {
           - **Summary:** ${aiAnalysis['ai-summary']}
         `;
 
-        console.log(message);
 
         // Uncomment to send to Slack
         // await sendToSlack(message);
       }
 
+      console.log(aiAnalysis);
+      
       // Update cache
       cache[repo] = tag_name;
       await saveCache(cache);
