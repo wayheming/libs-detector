@@ -95,6 +95,8 @@ async function callGPTAPI(description, repo, version, url) {
       }),
     });
 
+    console.log(response);
+
     if (!response.ok) {
       console.error(`Error calling OpenAI API: ${response.statusText}`);
       return null;
