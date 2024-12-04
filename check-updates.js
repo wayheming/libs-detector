@@ -133,11 +133,11 @@ async function callGPTAPI(description, repo, version, url) {
 
       if (aiAnalysis && (aiAnalysis.severity === 'low' || aiAnalysis.severity === 'medium' || aiAnalysis.severity === 'high')) {
         const message = `
-          :wave: Important release detected for ${repo}!
-- Version: ${tag_name}
-- URL: ${html_url}
-- Severity: ${aiAnalysis.severity.toUpperCase()}
-- AI Summary: ${aiAnalysis['ai-summary']}
+:wave: Important release detected for ${repo}!
+:card_index_dividers: Version: ${tag_name}
+:link: URL: ${html_url}
+:closed_lock_with_key: Severity: ${aiAnalysis.severity.toUpperCase()}
+:ai: AI Summary: ${aiAnalysis['ai-summary']}
         `;
 
         await sendToSlack(message);
