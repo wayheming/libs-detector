@@ -17,6 +17,12 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Ensure cache file exists
+        run: |
+          if [ ! -f checked_versions.json ]; then
+            echo "{}" > checked_versions.json
+          fi
+
       - name: Cache checked versions
         uses: actions/cache@v3
         with:
