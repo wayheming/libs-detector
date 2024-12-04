@@ -108,6 +108,8 @@ async function callGPTAPI(description, repo, version, url) {
 (async () => {
   const cache = await loadCache();
 
+  console.log(cache);
+
   for (const repo of repositories) {
     const release = await fetchRepositoryData(repo);
 
@@ -120,7 +122,6 @@ async function callGPTAPI(description, repo, version, url) {
         continue;
       }
 
-      // Call GPT API with new prompt
       const aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
 
       if (aiAnalysis && (aiAnalysis.severity === 'medium' || aiAnalysis.severity === 'high')) {
