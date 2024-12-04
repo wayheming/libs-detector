@@ -165,5 +165,4 @@ async function callGPTAPI(description, repo, version, url) {
       console.error(`Error processing repository ${repo}:`, err.message);
     }
   }
-  }
 })();
