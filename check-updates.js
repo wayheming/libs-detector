@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import fs from 'fs/promises';
 
 const repositories = [
   'jackocnr/intl-tel-input',
@@ -6,6 +7,25 @@ const repositories = [
   'chartjs/Chart.js',
   'Choices-js/Choices',
 ];
+
+const CACHE_FILE = 'checked_versions.json';
+
+async function loadCache() {
+  try {
+    const data = await fs.readFile(CACHE_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    return {};
+  }
+}
+
+async function saveCache(cache) {
+  try {
+    await fs.writeFile(CACHE_FILE, JSON.stringify(cache, null, 2));
+  } catch (err) {
+    console.error('Error saving cache:', err.message);
+  }
+}
 
 async function fetchRepositoryData(repoName) {
   const url = `https://api.github.com/repos/${repoName}/releases`;
@@ -35,53 +55,133 @@ async function sendToSlack(message) {
   }
 }
 
-async function callGPTAPI(description) {
-  const url = 'https://api.openai.com/v1/chat/completions';
+async function callGPTAPI(description, repo, version, url) {
+  const apiUrl = 'https://api.openai.com/v1/chat/completions';
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'user',
-          content: `Hi! Evaluate this release description for critical updates, security patches, and a brief summary: ${description}`,
-        },
-      ],
-    }),
-  });
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: `
+              You're a WPForms Developer trying to determine the significance of a new library update.
+              Here's a release description/changelog for evaluation: "${description}"
+              
+              Please provide a structured JSON output with the following keys:
+              - "library": ${repo}
+              - "version": ${version}
+              - "URL": ${url}
+              - "severity": One of "low", "medium", or "high" indicating the importance of the update.
+              - "ai-summary": A brief AI-generated summary of the release.
+              
+              Example response:
+              {
+                "library": "example-library",
+                "version": "1.2.3",
+                "URL": "https://example.com",
+                "severity": "medium",
+                "ai-summary": "This release fixes several security vulnerabilities."
+              }
+            `,
+          },
+        ],
+      }),
+    });
 
-  if (!response.ok) {
-    console.error(`Error calling OpenAI API: ${response.statusText}`);
-    return 'Failed to evaluate with AI.';
+    if (!response.ok) {
+      console.error(`Error calling OpenAI API: ${response.statusText}`);
+      return null;
+    }
+
+    const json = await response.json();
+    const structuredOutput = JSON.parse(json.choices[0].message.content);
+    return structuredOutput;
+  } catch (err) {
+    console.error(`Error calling OpenAI API: ${err.message}`);
+    return null;
   }
-
-  const json = await response.json();
-  return json.choices[0].message.content;
 }
 
 (async () => {
+  const cache = await loadCache();
+
   for (const repo of repositories) {
     const release = await fetchRepositoryData(repo);
 
     if (release) {
-      const aiAnalysis = await callGPTAPI(release.body);
+      const { tag_name, html_url, body } = release;
 
-      const message = `
-        :wave: Update detected for ${repo}!
-        - **Version:** ${release.tag_name}
-        - **Date:** ${release.published_at}
-        - **URL:** ${release.html_url}
-        - **AI Analysis:** ${aiAnalysis}
-      `;
+      // Skip if version already checked
+      if (cache[repo] === tag_name) {
+        console.log(`Version ${tag_name} of ${repo} is already checked. Skipping.`);
+        continue;
+      }
 
-      console.log(message);
+      // Call GPT API with new prompt
+      const aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
 
-      //await sendToSlack(message);
+      if (aiAnalysis && (aiAnalysis.severity === 'medium' || aiAnalysis.severity === 'high')) {
+        const message = `
+          :wave: Update detected for ${repo}!
+          - **Version:** ${tag_name}
+          - **URL:** ${html_url}
+          - **Severity:** ${aiAnalysis.severity.toUpperCase()}
+          - **Summary:** ${aiAnalysis['ai-summary']}
+        `;
+
+        console.log(message);
+
+        // Uncomment to send to Slack
+        // await sendToSlack(message);
+      }
+
+      // Update cache
+      cache[repo] = tag_name;
+      await saveCache(cache);
+    }
+  }
+})();
+
+(async () => {
+  const cache = await loadCache();
+
+  for (const repo of repositories) {
+    const release = await fetchRepositoryData(repo);
+
+    if (release) {
+      const { tag_name, html_url, body } = release;
+
+      if (cache[repo] === tag_name) {
+        console.log(`Version ${tag_name} of ${repo} is already checked. Skipping.`);
+        continue;
+      }
+
+     const aiAnalysis = await callGPTAPI(body, repo, tag_name, html_url);
+
+      if (aiAnalysis && (aiAnalysis.severity === 'medium' || aiAnalysis.severity === 'high')) {
+        const message = `
+          :wave: Update detected for ${aiAnalysis.library}!
+          - **Version:** ${aiAnalysis.version}
+          - **URL:** ${aiAnalysis.URL}
+          - **Severity:** ${aiAnalysis.severity.toUpperCase()}
+          - **Summary:** ${aiAnalysis['ai-summary']}
+        `;
+
+        console.log(message);
+
+        // Uncomment to send to Slack
+        // await sendToSlack(message);
+      }
+
+      cache[repo] = tag_name;
+      await saveCache(cache);
     }
   }
 })();
