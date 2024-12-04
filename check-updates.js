@@ -111,6 +111,8 @@ async function callGPTAPI(description, repo, version, url) {
 (async () => {
   const cache = await loadCache();
 
+  console.log(cache);
+
   for (const repo of repositories) {
     
     const release = await fetchRepositoryData(repo);
@@ -150,8 +152,6 @@ async function callGPTAPI(description, repo, version, url) {
         continue;
       }
     }
-
-    console.log(cache);
 
     cache[repo] = tag_name;
     await saveCache(cache);
