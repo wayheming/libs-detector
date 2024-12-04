@@ -20,7 +20,6 @@ async function loadCache() {
 }
 
 async function saveCache(cache) {
-  console.log(cache);
   try {
     await fs.writeFile(CACHE_FILE, JSON.stringify(cache, null, 2));
   } catch (err) {
