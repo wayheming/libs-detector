@@ -108,6 +108,33 @@ async function callGPTAPI(description, repo, version, url) {
   return JSON.parse(structuredOutput);
 }
 
+async function createGitHubIssue(repoOwner, repoName, title, body) {
+  const token = process.env.GITHUB_TOKEN; // Ваш GitHub токен
+  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/issues`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      title: title,
+      body: body,
+    }),
+  });
+
+  if (!response.ok) {
+    console.error(`Failed to create issue: ${response.status} ${response.statusText}`);
+    const errorDetails = await response.json();
+    console.error(errorDetails);
+    throw new Error('Error creating GitHub issue');
+  }
+
+  const issueData = await response.json();
+  console.log(`Issue created: ${issueData.html_url}`);
+}
+
 (async () => {
   const cache = await loadCache();
 
@@ -149,6 +176,14 @@ async function callGPTAPI(description, repo, version, url) {
         // await sendToSlack(message);
       } catch (err) {
         console.error(`Error sending message to Slack for ${repo}:`, err.message);
+        continue;
+      }
+
+       try {
+        await createGitHubIssue('wayheming', 'libs-detector', repo, message);
+  .catch(console.error);
+      } catch (err) {
+        console.error(`Error creating issue for ${repo}:`, err.message);
         continue;
       }
     }
