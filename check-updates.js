@@ -181,7 +181,6 @@ async function createGitHubIssue(repoOwner, repoName, title, body) {
 
        try {
         await createGitHubIssue('wayheming', 'libs-detector', repo, message);
-  .catch(console.error);
       } catch (err) {
         console.error(`Error creating issue for ${repo}:`, err.message);
         continue;
