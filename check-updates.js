@@ -108,9 +108,9 @@ async function callGPTAPI(description, repo, version, url) {
   return JSON.parse(structuredOutput);
 }
 
-async function createGitHubIssue(repoOwner, repoName, title, body) {
-  const token = process.env.GITHUB_TOKEN; // Ваш GitHub токен
-  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/issues`;
+async function createGitHubIssue(title, body) {
+  const token = process.env.GITHUB_TOKEN;
+  const url = `https://api.github.com/repos/wayheming/libs-detector/issues`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -180,7 +180,7 @@ async function createGitHubIssue(repoOwner, repoName, title, body) {
       }
 
        try {
-        await createGitHubIssue('wayheming', 'libs-detector', repo, message);
+        await createGitHubIssue(repo, message);
       } catch (err) {
         console.error(`Error creating issue for ${repo}:`, err.message);
         continue;
