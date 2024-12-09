@@ -8,8 +8,9 @@ const repositories = [
   'Choices-js/Choices',
 ];
 
-const CACHE_FILE = 'checked_versions2.json';
+const CACHE_FILE = 'checked_versions.json';
 
+// Load the cache file if it exists, or create an empty object.
 async function loadCache() {
   try {
     const data = await fs.readFile(CACHE_FILE, 'utf8');
@@ -19,6 +20,7 @@ async function loadCache() {
   }
 }
 
+// Save the cache object to a file.
 async function saveCache(cache) {
   try {
     await fs.writeFile(CACHE_FILE, JSON.stringify(cache, null, 2));
@@ -27,6 +29,7 @@ async function saveCache(cache) {
   }
 }
 
+// Fetch the latest release data for a repository.
 async function fetchRepositoryData(repoName) {
   const url = `https://api.github.com/repos/${repoName}/releases`;
 
@@ -41,13 +44,16 @@ async function fetchRepositoryData(repoName) {
   return releases[0] || null;
 }
 
+// Send a message to a Slack channel.
 async function sendToSlack(message) {
   const url = process.env.SLACK_WEBHOOK;
 
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: message }),
+    body: JSON.stringify({
+      data: message
+    }),
   });
 
   if (!response.ok) {
@@ -55,6 +61,7 @@ async function sendToSlack(message) {
   }
 }
 
+// Call the OpenAI API to analyze a release description.
 async function callGPTAPI(description, repo, version, url) {
   const apiUrl = 'https://api.openai.com/v1/chat/completions';
 
@@ -108,6 +115,7 @@ async function callGPTAPI(description, repo, version, url) {
   return JSON.parse(structuredOutput);
 }
 
+// Create a new issue on a GitHub repository.
 async function createGitHubIssue(title, body) {
   const token = process.env.GITHUB_TOKEN;
   const url = `https://api.github.com/repos/wayheming/libs-detector/issues`;
@@ -115,8 +123,8 @@ async function createGitHubIssue(title, body) {
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       title: title,
@@ -138,10 +146,7 @@ async function createGitHubIssue(title, body) {
 (async () => {
   const cache = await loadCache();
 
-  console.log(cache);
-
   for (const repo of repositories) {
-    
     const release = await fetchRepositoryData(repo);
 
     if (!release) {
@@ -173,14 +178,14 @@ async function createGitHubIssue(title, body) {
 :ai: AI Summary: ${aiAnalysis['ai-summary']}
 `;
       try {
-        // await sendToSlack(message);
+        await sendToSlack(message);
       } catch (err) {
         console.error(`Error sending message to Slack for ${repo}:`, err.message);
         continue;
       }
 
        try {
-        // await createGitHubIssue(repo, message);
+        await createGitHubIssue(repo, message);
       } catch (err) {
         console.error(`Error creating issue for ${repo}:`, err.message);
         continue;
