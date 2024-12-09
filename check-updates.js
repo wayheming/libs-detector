@@ -151,7 +151,7 @@ async function createGitHubIssue(title, body) {
 
     const { tag_name, html_url, body } = release;
 
-    if (cache[repo] === tag_name) {
+    if (cache[repo] && cache[repo].includes(tag_name)) {
       console.log(`Version ${tag_name} of ${repo} is already checked. Skipping.`);
       continue;
     }
@@ -187,7 +187,10 @@ async function createGitHubIssue(title, body) {
       }
     }
 
-    cache[repo] = tag_name;
+    if (!cache[repo]) {
+      cache[repo] = [];
+    }
+    cache[repo].push(tag_name);
     await saveCache(cache);
   }
 })();
