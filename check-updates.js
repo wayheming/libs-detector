@@ -143,6 +143,7 @@ async function createGitHubIssue(title, body) {
   console.log(`Issue created: ${issueData.html_url}`);
 }
 
+// Main function to check for updates.
 (async () => {
   const cache = await loadCache();
 
