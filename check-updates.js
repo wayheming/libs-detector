@@ -170,7 +170,7 @@ async function createGitHubIssue(title, body) {
       continue;
     }
 
-    if (aiAnalysis && ['medium', 'high'].includes(aiAnalysis.severity)) {
+    if (aiAnalysis) {
       const message = `
 :wave: Important release detected for ${repo}!
 :card_index_dividers: Version: ${tag_name}
@@ -184,12 +184,14 @@ async function createGitHubIssue(title, body) {
         console.error(`Error sending message to Slack for ${repo}:`, err.message);
         continue;
       }
-
-       try {
-        await createGitHubIssue(repo, message);
-      } catch (err) {
-        console.error(`Error creating issue for ${repo}:`, err.message);
-        continue;
+      
+      if (['medium', 'high'].includes(aiAnalysis.severity)) {
+        try {
+          await createGitHubIssue(repo, message);
+        } catch (err) {
+          console.error(`Error creating issue for ${repo}:`, err.message);
+          continue;
+        }
       }
     }
 
