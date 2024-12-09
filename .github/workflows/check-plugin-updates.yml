@@ -22,6 +22,8 @@ jobs:
         with:
           path: checked_versions.json
           key: checked-versions-v1
+          restore-keys: |
+            checked-versions-
 
       - name: Install dependencies
         run: npm install
