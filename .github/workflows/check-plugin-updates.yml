@@ -21,9 +21,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: checked_versions.json
-          key: checked-versions-${{ runner.os }}-v1
-          restore-keys: |
-            checked-versions-${{ runner.os }}-
+          key: checked-versions-v1
 
       - name: Install dependencies
         run: npm install
