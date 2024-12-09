@@ -21,7 +21,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: checked_versions.json
-          key: checked-versions-v1
+          key: checked-versions-v2
           restore-keys: |
             checked-versions-
 
