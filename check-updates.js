@@ -170,7 +170,7 @@ async function createGitHubIssue(title, body) {
       continue;
     }
 
-    if (aiAnalysis && ['low', 'medium', 'high'].includes(aiAnalysis.severity)) {
+    if (aiAnalysis && ['medium', 'high'].includes(aiAnalysis.severity)) {
       const message = `
 :wave: Important release detected for ${repo}!
 :card_index_dividers: Version: ${tag_name}
