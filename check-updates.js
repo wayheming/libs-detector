@@ -6,6 +6,7 @@ const repositories = [
   'cure53/DOMPurify',
   'chartjs/Chart.js',
   'Choices-js/Choices',
+  'WordPress/plugin-check',
 ];
 
 const CACHE_FILE = 'checked_versions_4.json';
