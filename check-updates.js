@@ -8,7 +8,7 @@ const repositories = [
   'Choices-js/Choices',
 ];
 
-const CACHE_FILE = 'checked_versions.json';
+const CACHE_FILE = 'checked_versions_4.json';
 
 // Load the cache file if it exists, or create an empty object.
 async function loadCache() {
