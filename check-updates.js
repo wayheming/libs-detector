@@ -180,7 +180,7 @@ async function createGitHubIssue(title, body) {
       }
 
        try {
-        await createGitHubIssue(repo, message);
+        // await createGitHubIssue(repo, message);
       } catch (err) {
         console.error(`Error creating issue for ${repo}:`, err.message);
         continue;
