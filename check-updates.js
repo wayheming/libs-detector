@@ -85,7 +85,10 @@ async function callGPTAPI(description, repo, version, url) {
             - "library": ${repo}
             - "version": ${version}
             - "URL": ${url}
-            - "severity": One of "low", "medium", or "high" indicating the importance of the update.
+            - "severity": Determined based on the following rules:
+              •	"low": Cosmetic updates or documentation changes.
+              •	"medium": Bug fixes or minor performance improvements.
+              •	"high": Security patches, critical bug fixes, or major new features.
             - "ai-summary": A brief AI-generated summary of the release.
 
            Return only clean and valid JSON text without.
