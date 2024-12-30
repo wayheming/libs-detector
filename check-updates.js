@@ -209,6 +209,13 @@ async function createGitHubIssue(title, body) {
       cache[repo] = [];
     }
     cache[repo].push(tag_name);
-    await saveCache(cache);
+    console.log('Before saving cache:', JSON.stringify(cache, null, 2));
+    try {
+      await saveCache(cache);
+      console.log('Cache saved successfully.');
+    } catch (err) {
+      console.error('Error saving cache:', err);
+    }
+    console.log('After saving cache:', JSON.stringify(cache, null, 2));
   }
 })();
