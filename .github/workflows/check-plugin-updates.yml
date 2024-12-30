@@ -19,9 +19,12 @@ jobs:
 
       - name: Cache checked versions
         uses: actions/cache@v3
+        id: cache-check
         with:
           path: ./checked_versions_5.json
           key: checked-versions-v5-${{ hashFiles('checked_versions_5.json') }}
+          restore-keys: |
+            checked-versions-v5-
 
       - name: Install dependencies
         run: npm install
@@ -33,8 +36,8 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - name: Save cache
+      - name: Save updated cache
         uses: actions/cache@v3
         with:
           path: ./checked_versions_5.json
-          key: checked-versions-v5-${{ hashFiles('checked_versions_5.json') }}
+          key: checked-versions-v5-${{ github.run_id }}
