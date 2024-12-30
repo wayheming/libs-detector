@@ -208,7 +208,7 @@ async function createGitHubIssue(title, body) {
     if (!cache[repo]) {
       cache[repo] = [];
     }
-    cache[repo].push(tag_name);
+    cache[repo] = [tag_name];
     console.log('Before saving cache:', JSON.stringify(cache, null, 2));
     try {
       await saveCache(cache);
