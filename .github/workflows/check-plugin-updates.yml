@@ -22,9 +22,9 @@ jobs:
         id: cache-check
         with:
           path: ./checked_versions_5.json
-          key: checked-versions-v5-${{ hashFiles('checked_versions_5.json') }}
+          key: checked-versions-v5
           restore-keys: |
-            checked-versions-v5-
+            checked-versions-v5
 
       - name: Install dependencies
         run: npm install
