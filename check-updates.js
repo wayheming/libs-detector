@@ -151,6 +151,8 @@ async function createGitHubIssue(title, body) {
 (async () => {
   const cache = await loadCache();
 
+  console.log(cache);
+
   for (const repo of repositories) {
     const release = await fetchRepositoryData(repo);
 
