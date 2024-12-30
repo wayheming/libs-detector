@@ -21,7 +21,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./checked_versions_5.json
-          key: checked-versions-v5-${{ hashFiles('checked_versions_4.json') }}
+          key: checked-versions-v5-${{ hashFiles('checked_versions_5.json') }}
           restore-keys: |
             checked-versions-v5-
 
@@ -34,3 +34,9 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Save cache
+        uses: actions/cache@v3
+        with:
+          path: ./checked_versions_5.json
+          key: checked-versions-v5-${{ hashFiles('checked_versions_5.json') }}
