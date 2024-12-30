@@ -9,7 +9,7 @@ const repositories = [
   'WordPress/plugin-check',
 ];
 
-const CACHE_FILE = './checked_versions_4.json';
+const CACHE_FILE = './checked_versions_5.json';
 
 // Load the cache file if it exists, or create an empty object.
 async function loadCache() {
@@ -209,7 +209,6 @@ async function createGitHubIssue(title, body) {
       cache[repo] = [];
     }
     cache[repo] = [tag_name];
-    console.log('Before saving cache:', JSON.stringify(cache, null, 2));
     try {
       await saveCache(cache);
       console.log('Cache saved successfully.');
