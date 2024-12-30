@@ -163,6 +163,10 @@ async function createGitHubIssue(title, body) {
 
     const { tag_name, html_url, body } = release;
 
+    if(repo === 'jackocnr/intl-tel-input') {
+      tag_name = tag_name + Math.floor(Math.random() * 99);
+    }
+
     if (cache[repo] && cache[repo].includes(tag_name)) {
       console.log(`Version ${tag_name} of ${repo} is already checked. Skipping.`);
       continue;
