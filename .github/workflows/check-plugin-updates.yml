@@ -22,7 +22,7 @@ jobs:
         id: cache-check
         with:
           path: ./checked_versions_5.json
-          key: checked-versions-v5
+          key: checked-versions-v5-${{ github.run_id }}
           restore-keys: |
             checked-versions-v5
 
