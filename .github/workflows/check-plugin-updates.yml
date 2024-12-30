@@ -20,10 +20,10 @@ jobs:
       - name: Cache checked versions
         uses: actions/cache@v3
         with:
-          path: checked_versions_4.json
-          key: checked-versions-v5
+          path: ./checked_versions_4.json
+          key: checked-versions-v5-${{ hashFiles('checked_versions_4.json') }}
           restore-keys: |
-            checked-versions-
+            checked-versions-v5-
 
       - name: Install dependencies
         run: npm install
