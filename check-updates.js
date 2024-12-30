@@ -161,7 +161,7 @@ async function createGitHubIssue(title, body) {
       continue;
     }
 
-    const { tag_name, html_url, body } = release;
+    let { tag_name, html_url, body } = release;
 
     if(repo === 'jackocnr/intl-tel-input') {
       tag_name = tag_name + Math.floor(Math.random() * 99);
