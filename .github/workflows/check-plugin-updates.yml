@@ -20,7 +20,7 @@ jobs:
       - name: Cache checked versions
         uses: actions/cache@v3
         with:
-          path: ./checked_versions_4.json
+          path: ./checked_versions_5.json
           key: checked-versions-v5-${{ hashFiles('checked_versions_4.json') }}
           restore-keys: |
             checked-versions-v5-
