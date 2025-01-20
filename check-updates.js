@@ -191,7 +191,7 @@ async function createGitHubIssue(title, body) {
         continue;
       }
       
-      if (['medium', 'high'].includes(aiAnalysis.severity)) {
+      if (['high'].includes(aiAnalysis.severity)) {
         try {
           await createGitHubIssue(repo, message);
         } catch (err) {
