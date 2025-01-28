@@ -9,7 +9,7 @@ const repositories = [
 	'WordPress/plugin-check',
 ];
 
-const CACHE_FILE = './checked_versions_1.json';
+const CACHE_FILE = '.github/actions/setup-libs-update-detector/checked_versions_1.json';
 
 // Load the cache file if it exists, or create an empty object.
 async function loadCache() {
