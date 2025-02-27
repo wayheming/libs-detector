@@ -51,23 +51,18 @@ async function fetchRepositoryData(repoName) {
 }
 
 // Send a message to a Slack channel.
-async function sendToSlack(message, severity) {
+async function sendToSlack(message) {
 	const url = process.env.SLACK_WEBHOOK;
 	
 	const payload = {
-		low: severity === 'low' ? message : '',
-		data: severity === 'low' ? '' : message,
+		data: message
 	};
-
-	console.log(payload);
 
 	const response = await fetch(url, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(payload),
 	});
-
-	console.log(response);
 
 	if (!response.ok) {
 		console.error(`Error sending message to Slack: ${response.statusText}`);
@@ -231,29 +226,31 @@ ${docLink}
 		}
 
 		if (aiAnalysis) {
-			let issueUrl;
-			
-			if (aiAnalysis.severity === 'high') {
-				const issueMessage = createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis);
+			if (aiAnalysis.severity !== 'low') {
+				let issueUrl;
+				
+				if (aiAnalysis.severity === 'high') {
+					const issueMessage = createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis);
+
+					try {
+						issueUrl = await createGitHubIssue(
+							`[${repo}] High-Priority Update v${tag_name}`, 
+							issueMessage
+						);
+					} catch (err) {
+						console.error(`Error creating issue for ${repo}:`, err.message);
+						continue;
+					}
+				}
+
+				const slackMessage = createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl);
 
 				try {
-					issueUrl = await createGitHubIssue(
-						`[${repo}] High-Priority Update v${tag_name}`, 
-						issueMessage
-					);
+					await sendToSlack(slackMessage);
 				} catch (err) {
-					console.error(`Error creating issue for ${repo}:`, err.message);
+					console.error(`Error sending message to Slack for ${repo}:`, err.message);
 					continue;
 				}
-			}
-
-			const slackMessage = createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl);
-
-			try {
-				await sendToSlack(slackMessage, aiAnalysis.severity);
-			} catch (err) {
-				console.error(`Error sending message to Slack for ${repo}:`, err.message);
-				continue;
 			}
 		}
 
