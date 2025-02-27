@@ -226,7 +226,10 @@ ${aiAnalysis['ai-summary']}
 				const issueMessage = createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis);
 
 				try {
-					issueUrl = await createGitHubIssue(repo, issueMessage);
+					issueUrl = await createGitHubIssue(
+						`[${repo}] High-Priority Update v${tag_name}`, 
+						issueMessage
+					);
 				} catch (err) {
 					console.error(`Error creating issue for ${repo}:`, err.message);
 					continue;
