@@ -157,6 +157,37 @@ async function createGitHubIssue(title, body) {
 	console.log(`Issue created: ${issueData.html_url}`);
 }
 
+function createSlackMessage(repo, tag_name, html_url, aiAnalysis) {
+	return `Hello @wpforms-release-team! <!here>
+
+A new release has been detected! 🎉 cc @Ernest
+
+*Library:* ${repo}
+*Version:* ${tag_name}
+*Severity:* ${aiAnalysis.severity.toUpperCase()} ${aiAnalysis.severity === 'high' ? '🚨' : aiAnalysis.severity === 'medium' ? '⚠️' : '📝'}
+*Release URL:* ${html_url}
+
+*AI Analysis Summary:*
+${aiAnalysis['ai-summary']}
+
+${aiAnalysis.severity === 'high' ? '_A GitHub issue has been created for tracking this high-priority update._' : ''}`;
+}
+
+function createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis) {
+	return `# New High-Priority Update: ${repo}
+
+## Release Details
+- **Version:** ${tag_name}
+- **Severity:** ${aiAnalysis.severity.toUpperCase()}
+- **Release URL:** ${html_url}
+
+## AI Analysis Summary
+${aiAnalysis['ai-summary']}
+
+---
+*This issue was automatically created by the Library Update Detector.*`;
+}
+
 // Main function to check for updates.
 (async () => {
 	const cache = await loadCache();
@@ -187,23 +218,20 @@ async function createGitHubIssue(title, body) {
 		}
 
 		if (aiAnalysis) {
-			const message = `
-:wave: Important release detected for ${repo}!
-:card_index_dividers: Version: ${tag_name}
-:link: URL: ${html_url}
-:closed_lock_with_key: Severity: ${aiAnalysis.severity.toUpperCase()}
-:ai: AI Summary: ${aiAnalysis['ai-summary']}
-`;
+			const slackMessage = createSlackMessage(repo, tag_name, html_url, aiAnalysis);
+
 			try {
-				await sendToSlack(message, aiAnalysis.severity);
+				await sendToSlack(slackMessage, aiAnalysis.severity);
 			} catch (err) {
 				console.error(`Error sending message to Slack for ${repo}:`, err.message);
 				continue;
 			}
 
 			if (['high'].includes(aiAnalysis.severity)) {
+				const issueMessage = createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis);
+
 				try {
-					await createGitHubIssue(repo, message);
+					await createGitHubIssue(repo, issueMessage);
 				} catch (err) {
 					console.error(`Error creating issue for ${repo}:`, err.message);
 					continue;
