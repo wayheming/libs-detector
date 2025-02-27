@@ -57,8 +57,9 @@ async function sendToSlack(message, severity) {
 	const payload = {
 		data: severity === 'low' ? '' : message,
 		low: severity === 'low' ? message : '',
-		text: 'New library update detected'
 	};
+
+	console.log(payload);
 
 	const response = await fetch(url, {
 		method: 'POST',
