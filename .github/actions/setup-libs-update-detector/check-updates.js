@@ -54,12 +54,10 @@ async function fetchRepositoryData(repoName) {
 async function sendToSlack(message, severity) {
 	const url = process.env.SLACK_WEBHOOK;
 	
-	const payload = {};
-	if (severity === 'low') {
-		payload.low = message;
-	} else {
-		payload.data = message;
-	}
+	const payload = {
+		data: severity === 'low' ? '' : message,
+		low: severity === 'low' ? message : ''
+	};
 
 	const response = await fetch(url, {
 		method: 'POST',
@@ -185,8 +183,7 @@ function createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis) {
 		? `\n\n## Testing Documentation\nPlease follow the testing guidelines here: ${documentationLinks[repo]}` 
 		: '';
 
-	return `# New High-Priority Update: ${repo}
-
+	return `
 ## Release Details
 - **Version:** ${tag_name}
 - **Severity:** ${aiAnalysis.severity.toUpperCase()}
