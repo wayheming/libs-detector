@@ -67,6 +67,8 @@ async function sendToSlack(message, severity) {
 		body: JSON.stringify(payload),
 	});
 
+	console.log(response);
+
 	if (!response.ok) {
 		console.error(`Error sending message to Slack: ${response.statusText}`);
 	}
