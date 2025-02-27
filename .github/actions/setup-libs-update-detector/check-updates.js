@@ -158,7 +158,7 @@ async function createGitHubIssue(title, body) {
 function createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl) {
 	return `Hello team! :wave:
 
-*${repo}* has a new ${aiAnalysis.severity.toUpperCase()} priority update to version *${tag_name}* ${aiAnalysis.severity === 'high' ? '🚨' : '⚠️'}
+${repo} has a new ${aiAnalysis.severity.toUpperCase()} priority update to version ${tag_name} ${aiAnalysis.severity === 'high' ? '🚨' : '⚠️'}
 
 ${aiAnalysis.severity === 'medium' ? `:brain: AI Summary: ${aiAnalysis['ai-summary']}\n\n` : ''}
 :link: <${html_url}|View release details>
