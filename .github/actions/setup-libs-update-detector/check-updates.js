@@ -155,12 +155,14 @@ async function createGitHubIssue(title, body) {
 	return issueData.html_url;
 }
 
-function createSlackMessage(repo, tag_name, aiAnalysis, issueUrl) {
+function createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl) {
 	return `Hello team! :wave:
 
 *${repo}* has a new ${aiAnalysis.severity.toUpperCase()} priority update to version *${tag_name}* ${aiAnalysis.severity === 'high' ? '🚨' : '⚠️'}
 
-${issueUrl ? `👉 Details and next steps: ${issueUrl}` : ''}`;
+${aiAnalysis.severity === 'medium' ? `:brain: AI Summary: ${aiAnalysis['ai-summary']}\n\n` : ''}
+:link: <${html_url}|View release details>
+${issueUrl ? `\n👉 <${issueUrl}|View GitHub issue for tracking>` : ''}`;
 }
 
 function createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis) {
@@ -235,7 +237,7 @@ ${docLink}
 					}
 				}
 
-				const slackMessage = createSlackMessage(repo, tag_name, aiAnalysis, issueUrl);
+				const slackMessage = createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl);
 
 				try {
 					await sendToSlack(slackMessage);
