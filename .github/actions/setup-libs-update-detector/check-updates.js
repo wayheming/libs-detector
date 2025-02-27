@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import fs from 'fs/promises';
 
+// The repositories to check for updates.
 const repositories = [
 	'jackocnr/intl-tel-input',
 	'cure53/DOMPurify',
@@ -9,7 +10,11 @@ const repositories = [
 	'WordPress/plugin-check',
 ];
 
+// The file to save the cache of checked versions.
 const CACHE_FILE = '.github/actions/setup-libs-update-detector/checked_versions_1.json';
+
+// The URL of the repository to create issues on.
+const repoUrl = 'https://api.github.com/repos/wayheming/libs-detector/issues';
 
 // Load the cache file if it exists, or create an empty object.
 async function loadCache() {
@@ -122,9 +127,8 @@ async function callGPTAPI(description, repo, version, url) {
 // Create a new issue on a GitHub repository.
 async function createGitHubIssue(title, body) {
 	const token = process.env.GITHUB_TOKEN;
-	const url = `https://api.github.com/repos/wayheming/libs-detector/issues`;
 
-	const response = await fetch(url, {
+	const response = await fetch(repoUrl, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -133,6 +137,7 @@ async function createGitHubIssue(title, body) {
 		body: JSON.stringify({
 			title: title,
 			body: body,
+			assignees: ['wayheming']
 		}),
 	});
 
