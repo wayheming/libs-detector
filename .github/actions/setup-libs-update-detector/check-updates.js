@@ -56,13 +56,9 @@ async function sendToSlack(message, severity) {
 	
 	const payload = {
 		data: severity === 'low' ? '' : message,
-		low: severity === 'low' ? message : ''
+		low: severity === 'low' ? message : '',
+		text: 'New library update detected'
 	};
-
-	// Додаємо text поле, яке є обов'язковим для деяких типів Slack webhooks
-	if (!payload.text) {
-		payload.text = "New library update detected"; // Fallback текст
-	}
 
 	const response = await fetch(url, {
 		method: 'POST',
@@ -72,13 +68,6 @@ async function sendToSlack(message, severity) {
 
 	if (!response.ok) {
 		console.error(`Error sending message to Slack: ${response.statusText}`);
-		// Додаємо більше інформації про помилку
-		try {
-			const errorData = await response.json();
-			console.error('Slack error details:', errorData);
-		} catch (e) {
-			console.error('Could not parse error response');
-		}
 	}
 }
 
