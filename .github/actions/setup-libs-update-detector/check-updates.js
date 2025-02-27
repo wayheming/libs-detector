@@ -51,15 +51,20 @@ async function fetchRepositoryData(repoName) {
 }
 
 // Send a message to a Slack channel.
-async function sendToSlack(message) {
+async function sendToSlack(message, severity) {
 	const url = process.env.SLACK_WEBHOOK;
+	
+	const payload = {};
+	if (severity === 'low') {
+		payload.low = message;
+	} else {
+		payload.data = message;
+	}
 
 	const response = await fetch(url, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			data: message
-		}),
+		body: JSON.stringify(payload),
 	});
 
 	if (!response.ok) {
@@ -190,7 +195,7 @@ async function createGitHubIssue(title, body) {
 :ai: AI Summary: ${aiAnalysis['ai-summary']}
 `;
 			try {
-				await sendToSlack(message);
+				await sendToSlack(message, aiAnalysis.severity);
 			} catch (err) {
 				console.error(`Error sending message to Slack for ${repo}:`, err.message);
 				continue;
