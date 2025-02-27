@@ -158,15 +158,13 @@ async function createGitHubIssue(title, body) {
 function createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl) {
 	return `Hello team! :wave:
 
-${repo} has a new ${aiAnalysis.severity === 'high' ? '🚨 HIGH' : '⚠️ MEDIUM'} priority update to version ${tag_name}
-
-${aiAnalysis.severity === 'medium' ? `:brain: AI Summary: ${aiAnalysis['ai-summary']}\n\n` : ''}
+${repo} has a new ${aiAnalysis.severity === 'high' ? '🚨 HIGH' : '⚠️ MEDIUM'} priority update to version ${tag_name} \n
+${aiAnalysis.severity === 'medium' ? `:brain: AI Summary: ${aiAnalysis['ai-summary']}\n` : ''}
 ${aiAnalysis.severity === 'medium' ? `:link: Release details: ${html_url}\n` : ''}
 ${issueUrl ? `👉 GitHub issue: ${issueUrl}` : ''}`;
 }
 
 function createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis) {
-	// Мапа документації для конкретних бібліотек
 	const documentationLinks = {
 		'jackocnr/intl-tel-input': 'https://github.com/awesomemotive/wpforms-plugin/wiki/Phone-field%27s-%60intl%E2%80%90tel%E2%80%90input%60-library',
 		'cure53/DOMPurify': 'https://github.com/awesomemotive/wpforms-plugin/wiki/DOMPurify-Lib-Update-testing'
