@@ -157,7 +157,7 @@ async function createGitHubIssue(title, body) {
 }
 
 function createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl) {
-	return `Hello @wpforms-development!
+	return `Hello team!
 
 A new release has been detected! 🎉
 
