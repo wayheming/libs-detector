@@ -155,9 +155,10 @@ async function createGitHubIssue(title, body) {
 
 	const issueData = await response.json();
 	console.log(`Issue created: ${issueData.html_url}`);
+	return issueData.html_url;
 }
 
-function createSlackMessage(repo, tag_name, html_url, aiAnalysis) {
+function createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl) {
 	return `Hello @wpforms-release-team! <!here>
 
 A new release has been detected! 🎉 cc @Ernest
@@ -170,7 +171,7 @@ A new release has been detected! 🎉 cc @Ernest
 *AI Analysis Summary:*
 ${aiAnalysis['ai-summary']}
 
-${aiAnalysis.severity === 'high' ? '_A GitHub issue has been created for tracking this high-priority update._' : ''}`;
+${issueUrl ? `_A GitHub issue has been created for tracking this high-priority update: ${issueUrl}_` : ''}`;
 }
 
 function createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis) {
@@ -218,24 +219,27 @@ ${aiAnalysis['ai-summary']}
 		}
 
 		if (aiAnalysis) {
-			const slackMessage = createSlackMessage(repo, tag_name, html_url, aiAnalysis);
+			let issueUrl;
+			
+			// Створюємо issue першим, якщо severity high
+			if (['high'].includes(aiAnalysis.severity)) {
+				const issueMessage = createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis);
+
+				try {
+					issueUrl = await createGitHubIssue(repo, issueMessage);
+				} catch (err) {
+					console.error(`Error creating issue for ${repo}:`, err.message);
+					continue;
+				}
+			}
+
+			const slackMessage = createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl);
 
 			try {
 				await sendToSlack(slackMessage, aiAnalysis.severity);
 			} catch (err) {
 				console.error(`Error sending message to Slack for ${repo}:`, err.message);
 				continue;
-			}
-
-			if (['high'].includes(aiAnalysis.severity)) {
-				const issueMessage = createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis);
-
-				try {
-					await createGitHubIssue(repo, issueMessage);
-				} catch (err) {
-					console.error(`Error creating issue for ${repo}:`, err.message);
-					continue;
-				}
 			}
 		}
 
