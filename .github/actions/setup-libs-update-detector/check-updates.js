@@ -159,19 +159,19 @@ async function createGitHubIssue(title, body) {
 }
 
 function createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl) {
-	return `Hello @wpforms-development! <!here>
+	return `Hello @wpforms-development!
 
-A new release has been detected! 🎉 cc @Ernest
+A new release has been detected! 🎉
 
-*Library:* ${repo}
-*Version:* ${tag_name}
-*Severity:* ${aiAnalysis.severity.toUpperCase()} ${aiAnalysis.severity === 'high' ? '🚨' : aiAnalysis.severity === 'medium' ? '⚠️' : '📝'}
-*Release URL:* ${html_url}
+Library: ${repo}
+Version: ${tag_name}
+Severity: ${aiAnalysis.severity.toUpperCase()} ${aiAnalysis.severity === 'high' ? '🚨' : aiAnalysis.severity === 'medium' ? '⚠️' : '📝'}
+Release URL: ${html_url}
 
-*AI Analysis Summary:*
+AI Analysis Summary:
 ${aiAnalysis['ai-summary']}
 
-${issueUrl ? `_A GitHub issue has been created for tracking this high-priority update: ${issueUrl}_` : ''}`;
+${issueUrl ? `A GitHub issue has been created for tracking this high-priority update: ${issueUrl}` : ''}`;
 }
 
 function createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis) {
