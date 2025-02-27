@@ -160,9 +160,9 @@ function createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl) {
 
 ${repo} has a new ${aiAnalysis.severity === 'high' ? '🚨 HIGH' : '⚠️ MEDIUM'} priority update to version ${tag_name}
 
-${aiAnalysis.severity === 'medium' ? `:brain: AI Summary:\n${aiAnalysis['ai-summary']}\n\n` : ''}
-${aiAnalysis.severity === 'medium' ? `:link: Release details:\n${html_url}\n` : ''}
-${issueUrl ? `👉 GitHub issue:\n${issueUrl}` : ''}`;
+${aiAnalysis.severity === 'medium' ? `:brain: AI Summary:${aiAnalysis['ai-summary']}\n\n` : ''}
+${aiAnalysis.severity === 'medium' ? `:link: Release details:${html_url}\n` : ''}
+${issueUrl ? `👉 GitHub issue:${issueUrl}` : ''}`;
 }
 
 function createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis) {
