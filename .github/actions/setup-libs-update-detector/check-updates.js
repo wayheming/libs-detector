@@ -55,8 +55,8 @@ async function sendToSlack(message, severity) {
 	const url = process.env.SLACK_WEBHOOK;
 	
 	const payload = {
-		data: severity === 'low' ? '' : message,
 		low: severity === 'low' ? message : '',
+		data: severity === 'low' ? '' : message,
 	};
 
 	console.log(payload);
