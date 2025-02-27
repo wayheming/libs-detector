@@ -59,6 +59,11 @@ async function sendToSlack(message, severity) {
 		low: severity === 'low' ? message : ''
 	};
 
+	// Додаємо text поле, яке є обов'язковим для деяких типів Slack webhooks
+	if (!payload.text) {
+		payload.text = "New library update detected"; // Fallback текст
+	}
+
 	const response = await fetch(url, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
@@ -67,6 +72,13 @@ async function sendToSlack(message, severity) {
 
 	if (!response.ok) {
 		console.error(`Error sending message to Slack: ${response.statusText}`);
+		// Додаємо більше інформації про помилку
+		try {
+			const errorData = await response.json();
+			console.error('Slack error details:', errorData);
+		} catch (e) {
+			console.error('Could not parse error response');
+		}
 	}
 }
 
@@ -157,7 +169,7 @@ async function createGitHubIssue(title, body) {
 }
 
 function createSlackMessage(repo, tag_name, html_url, aiAnalysis, issueUrl) {
-	return `Hello team!
+	return `Hello team! :wave:
 
 A new release has been detected! 🎉
 
@@ -166,7 +178,7 @@ Version: ${tag_name}
 Severity: ${aiAnalysis.severity.toUpperCase()} ${aiAnalysis.severity === 'high' ? '🚨' : aiAnalysis.severity === 'medium' ? '⚠️' : '📝'}
 Release URL: ${html_url}
 
-AI Analysis Summary:
+:brain: AI Analysis Summary:
 ${aiAnalysis['ai-summary']}
 
 ${issueUrl ? `A GitHub issue has been created for tracking this high-priority update: ${issueUrl}` : ''}`;
@@ -229,8 +241,7 @@ ${docLink}
 		if (aiAnalysis) {
 			let issueUrl;
 			
-			// Створюємо issue першим, якщо severity high
-			if (['high'].includes(aiAnalysis.severity)) {
+			if (aiAnalysis.severity === 'high') {
 				const issueMessage = createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis);
 
 				try {
