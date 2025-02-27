@@ -175,6 +175,16 @@ ${issueUrl ? `_A GitHub issue has been created for tracking this high-priority u
 }
 
 function createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis) {
+	// Мапа документації для конкретних бібліотек
+	const documentationLinks = {
+		'jackocnr/intl-tel-input': 'https://github.com/awesomemotive/wpforms-plugin/wiki/Phone-field%27s-%60intl%E2%80%90tel%E2%80%90input%60-library',
+		'cure53/DOMPurify': 'https://github.com/awesomemotive/wpforms-plugin/wiki/DOMPurify-Lib-Update-testing'
+	};
+
+	const docLink = documentationLinks[repo] 
+		? `\n\n## Testing Documentation\nPlease follow the testing guidelines here: ${documentationLinks[repo]}` 
+		: '';
+
 	return `# New High-Priority Update: ${repo}
 
 ## Release Details
@@ -184,6 +194,7 @@ function createGitHubIssueMessage(repo, tag_name, html_url, aiAnalysis) {
 
 ## AI Analysis Summary
 ${aiAnalysis['ai-summary']}
+${docLink}
 
 ---
 *This issue was automatically created by the Library Update Detector.*`;
